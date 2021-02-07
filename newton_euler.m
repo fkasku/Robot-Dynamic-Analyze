@@ -17,8 +17,9 @@ T(alp_i,a_i,d_i,the_i) = [cos(the_i)  -sin(the_i)    0   a_i;
     sin(the_i)*cos(alp_i)   cos(the_i)*cos(alp_i)   -sin(alp_i)   -sin(alp_i)*d_i;
     sin(the_i)*sin(alp_i)   cos(the_i)*sin(alp_i)   cos(alp_i)    cos(alp_i)*d_i;
     0                           0                         0           1];   
-    
-D_H = [pi/2 0 d1 0 ; 
+ 
+%DH Table
+D_H = [pi/2 0 d1 0 ;         
          -pi/2 0 d2 0 ;
            -pi/2  0  l3  th3;
             pi/2  0   d4  0];
@@ -46,22 +47,30 @@ end
 disp('forward kinematics')
 simplify(TP)
 
+%initial conditions for robot
 w0 = [0 0 0].';
 dw0 = [0 0 0].';
 v0 = [0 0 0].';
-dv0 = [0 g 0].';
+dv0 = [0 g 0].';  % baþlangýçta +y yönünde bir yerçekimi bulunuyor
 Z =    [0 0 1].';
 
+%derivatives of joint variables
 Dp = {d_d1 d_d2 d_th3 d_d4};
 DDp = {dd_d1 dd_d2 dd_th3  dd_d4 };
+
+%Mass center by joints
 Pc=[ 0   0  -l1/2 ;
       0   0   -l2/2 ;
        0   0  -l3/2 ;
          0   0   -l4/2 ];
-M=[m1 m2 m3 m4];
+%Mass of joints
+     M=[m1 m2 m3 m4];
 
+% Type of joints 
 Type = {'P','P','R','P'};
-for i=1:dof             %i :1 : robot eksen sayýsý kadar
+
+%inertia
+for i=1:dof          
     syms(['Ixx',num2str(i)])
     syms(['Iyy',num2str(i)])
     syms(['Izz',num2str(i)])
@@ -127,6 +136,7 @@ MyRot= eye(3);
 Myf=[0;0;0]; %manipulator can move without starting forces   = ff{i+1}
 Myn = [0;0;0]; %manipulator can move without starting torque = nn{i+1}
 
+%içedönük denklemlerin hesaplamasý
 Myp = [0;0;0];
 for i = dof:-1:1
     R{i}=TT{i}(1:3,1:3);
@@ -140,7 +150,6 @@ for i = dof:-1:1
     end 
 end
 
-%rev joint için hesaplama
 for i=1:dof
      if  (Type{i} == 'R')
     Tau{i}=nn{i}.'*Z;    

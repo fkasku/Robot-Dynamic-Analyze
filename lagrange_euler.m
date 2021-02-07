@@ -1,6 +1,5 @@
 %30.01.21
-%workout for make up exam
-% based on Cenk Karaman
+%based on Cenk Karaman
 %major differencess
 
 clear all;close all;clc;
@@ -18,16 +17,14 @@ T(alp_i,a_i,d_i,the_i) = [cos(the_i)  -sin(the_i)    0   a_i;
     sin(the_i)*sin(alp_i)   cos(the_i)*sin(alp_i)   cos(alp_i)    cos(alp_i)*d_i;
     0                           0                         0           1];   
     
-  % ornek 2 DH
+
+%DH Table
 D_H = [pi/2 0 d1 0 ; 
          -pi/2 0 d2 0 ;
            -pi/2  0  l3  th3;
             pi/2  0   d4  0];
 
-%ORNEK 1 DH
-% D_H = [0 0 0 th1; 
-%          0 l1 0 th2;
-%             0 l2 0 0];
+
 dof = length(D_H(:,1));
 TT = cell(dof,1);
 TTS = TT;
@@ -53,11 +50,11 @@ end
 disp('forward kinematics')
 simplify(TP)
 
-%mass
 
 
 
-%atalet tensörü
+
+%inertia 
 for i=1:dof           %i :1 : robot eksen sayýsý kadar
     syms(['Ixx',num2str(i)])
     syms(['Iyy',num2str(i)])
@@ -68,11 +65,7 @@ for i=1:dof
     Ic{i} = [eval(['Ixx',num2str(i)]) 0     0;...
              0  eval(['Iyy',num2str(i)])    0;...
             0  0   eval(['Izz',num2str(i)])];
-% 
-%    Ic{i}=[0 0 0;...
-%           0 0 0;...
-%            0 0 0];
-        
+
 end
 
 
@@ -80,25 +73,31 @@ end
 for i=1:dof
     I{i}=tr{i}(1:3,1:3)*Ic{i}*tr{i}(1:3,1:3).';
 end
-%dhi eklemlerin kendi eksenlerine göre kordinatlarý
+
+%dh{i} mass center of joints by their center
 
 dh{1}=[0 0 -l1/2 1].';
 dh{2}=[0 0 -l2/2 1].';
 dh{3}=[0 0 -l3/2 1].';
 dh{4}=[0 0 -l4/2 1].';% if no values put 0 last digit of matrix
+
+
 %position to base
 for i=1:dof
     h{i}=tr{i}*dh{i};
 end
 
 
-% joint variablTes
+% joint variables
 m={m1, m2 , m3, m4};  % putt 'null' if no value belongs to last digit  {m1,m2, null}
 q={ d1, d2, th3 , d4};  % putt 'null' if no value belongs to last digit  {m1,m2, null}
 
+
+%derivatives of joint variables
 d_q = [d_d1 ; d_d2; d_th3; d_d4];
 dd_q = [dd_d1; dd_d2; dd_th3 ; dd_d4];  % put '0' if d_qn=0
 
+%Matrix A of J
 for i=1:dof
     
     for j=1:dof
@@ -128,7 +127,7 @@ Bx{3}= [0 0 0].';
 Bx{4}= [0 0 0].';
 %B={ 0 0 0; 0 0 0; 0 0 0}
 
-Type = {'P','P','R','P'};   % prepare for joints
+Type = {'P','P','R','P'};   % Type of joints
 for i =1 :dof
     if (Type{i} == 'R')
 Bx{i}= tr{i}(1:3,1:3)*z;
@@ -161,8 +160,6 @@ for i = 1:dof
     C{i} =temp
 end
 
-%yerçekimi vektörü baþlangýç eksenine göre alýnýr
-% bu soru için -z yönündedir (-g)
 
 gravit=0;
 grav=cell(dof,1);
@@ -203,9 +200,9 @@ end
     for i=1: dof
         for j=1:dof
              cd_q{i,j}= d_q(i)*d_q(j);
-      %coriolis ve merkezkaç kuvvet vektörü
         end 
     end
+    
     
       cq=cell(dof,1);
       sayac=0;
